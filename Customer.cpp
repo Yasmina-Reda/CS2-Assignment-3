@@ -43,9 +43,14 @@ void Cprintzero(int time) //not included in class Customer, just to print minute
 
 void Customer::printinfo()
 {
-		cout << "\nName: " << getName();
+		cout << "\n\nName: " << getName();
 		cout << "\nMechanicID: " << getMechId();
-		cout << "\nAppointment Info:\n";
+		cout << "\nAppointment Info:";
 		cout << "\nStart Time " << getAppt().starthours << ":"; Cprintzero(getAppt().startmins);
 		cout << "\nEnd Time " << getAppt().endhours << ":"; Cprintzero(getAppt().endmins);
+}
+
+void Customer::printtime() {
+	cout << " from " << getAppt().starthours << ":"; Cprintzero(getAppt().startmins);
+	cout << " to " << getAppt().endhours << ":"; Cprintzero(getAppt().endmins);
 }

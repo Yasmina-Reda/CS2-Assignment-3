@@ -18,5 +18,6 @@ public:
 	bool operator < (Customer);
 	bool operator == (Customer);
 	void printinfo(); //Did not print age or id because I do not think the are relevant to customer, so I will not set them
+	void printtime();
 
 };

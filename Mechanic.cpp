@@ -99,11 +99,11 @@ void Mprintzero(int time) //not included in class Mechanic, just to print minute
 void Mechanic::printinfo()
 {
 	cout << "\n\nName: " << getName();
-	cout << "\nID: " << getId();
 	cout << "\nAge: " << getAge();
+	cout << "\nID: " << getId();
 	cout << "\nNumber of Appointments: " << counter;
 	cout << "\n\nAppointments info: ";
-	for (int i = 0; i < counter;i++) //print individual appointment details
+	for (int i = 0; i < counter;i++) //print individual appointment details //would have rather sorted them ascendingly but would be a lot of extra work right now
 	{
 		cout << "\n\nAppointment " << i + 1;
 		cout << "\nStart Time " << getAppt(i).starthours << ":"; Mprintzero(getAppt(i).startmins);
