@@ -9,23 +9,24 @@
 #include <string>
 #include "Queue.h"
 
-void validatetime(int&, int&, int&, int&, int, string); //to validate that the entered time is correct
-void readtime(string&, int&, int&); //reads a string of time in hh:mm format and sends back the hours and mins
-int readMechData(Mechanic[], int); //inputs and sets the data of a mechanic from a file
-int readCustData(Customer*&, Mechanic[], int); //takes in and sets the data of a customer, creates customer array and returns its size
-string getAssignedMech(string, Mechanic[], int); //returns the assigned mechanic 
-int AssignAppt(Customer*, int, Mechanic[], int, Customer*&); //Assigns customers to mechanics, creates a new array without cancelled appointments and returns size
+void validatetime(int&, int&, int&, int&,string&,string&, int, string); //to validate that the entered time is correct and modify if not
+void readtime(string&, int&, int&); //reads a string of time in hh:mm format and sets back the hours and mins
+void settime(string&, int, int); //rads hours and mins and sets a string in hh:mm
+int readMechData(Mechanic[], int); //reads and sets the data of mechanics from a file
+int readCustData(Customer*&, Mechanic[], int); //reads in and sets the data of a customer, creates an array of customers and returns its size
+string getAssignedMech(string, Mechanic[], int); //returns the assigned mechanic name according to mechanic id
+int AssignAppt(Customer*, int, Mechanic[], int, Customer*&); //Assigns customers to mechanics, creates a new array without cancelled appointments and returns its size
 template <class T>
-void swap(T*, int, int); //swaps two elements in an array of index i and j
+void swap(T*, int, int); //swaps any two elements in an array of index i and j
 void sortArray(Customer*, int); //sorts customers ascendingly
 void QueueCust(Queue<Customer>& QC, Customer*, int); //Queues sorted Customers 
-void printQueue(Queue<Customer>& QC, int apptCount, Mechanic[], int); //prints queue with assigned mechanic
+void printQueue(Queue<Customer>& QC, int apptCount, Mechanic[], int); //prints queue with assigned mechanic and time info
 void writeMech(Mechanic[], int); //writes mech data to new file
 
 
 int main()
 {
-	cout << "\nWelcome to TKRVGS Bike Workshop!";
+	cout << "\nWelcome to TKRVGS Motorbike Workshop!\n\n";
 	int mCount = 3, cCount, apptCount;
 	Mechanic arr[3];
 	readMechData(arr,mCount);
@@ -36,12 +37,6 @@ int main()
 	QueueCust(QC, newCptr, apptCount);
 	printQueue(QC, apptCount, arr, mCount);
 	writeMech(arr,mCount);
-
-	cout << "\n\nOUR TEAM:\n";
-	for (int i = 0;i < mCount;i++)
-	{
-		arr[i].printinfo(); cout << "\n\n";
-	}
 	cout << endl;
 
 	delete[]Cptr, newCptr;
@@ -49,50 +44,61 @@ int main()
 	return 0;
 }
 
-void validatetime(int& starthours, int& startmins, int& endhours, int& endmins, int count, string name)
+void validatetime(int& starthours, int& startmins, int& endhours, int& endmins,string&starttime,string&endtime, int num, string name)
 {
 	string temp;
 	while (starthours < 0 || starthours >= 24)
 	{
-		cout << "\nInvalid starting hour. Please re-enter time: "; cin >> temp;
+		cout << name << " slot " << num+1<< " Invalid starting hour. Please re-enter time: "; cin >> temp;
 		readtime(temp, starthours, startmins);
-	}
-
-	while (endhours < 0 || endhours >= 24 || endhours < starthours)
-	{
-		cout << "\nInvalid ending hour. Please re-enter time: "; cin >> temp;
-		readtime(temp, endhours, endmins);
+		settime(starttime, starthours, startmins);
 	}
 
 	while (startmins < 0 || startmins >= 60)
 	{
-		cout << "\nInvalid starting minutes. Please re-enter time: "; cin >> temp;
+		cout << name << " slot " << num+1 << " Invalid starting minutes. Please re-enter time: "; cin >> temp;
 		readtime(temp, starthours, startmins);
+		settime(starttime, starthours, startmins);
+	}
+
+	while (endhours < 0 || endhours >= 24 || endhours < starthours)
+	{
+		cout << name << " slot " << num+1 << " Invalid ending hour. Please re-enter time: "; cin >> temp;
+		readtime(temp, endhours, endmins);
+		settime(endtime, endhours, endmins);
 	}
 
 	while (endmins < 0 || endmins >= 60 || starthours == endhours && startmins == endmins || starthours == endhours && endmins < startmins)
 	{
-		cout << "\nInvalid ending minutes for slot. Please re - enter time: "; cin >> temp;
+		cout << name << " slot " << num+1 << " Invalid ending minutes for slot. Please re - enter time: "; cin >> temp;
 		readtime(temp, endhours, endmins);
+		settime(endtime, endhours, endmins);
 	}
 }
 
 void readtime(string& time, int& hr, int& min)
-{
-	if (time.length() != 4 && time.length() != 5)
-	{
-		cout << "Invalid time. Please re-enter: "; cin >> time;
-	}
-	string shr = "", smin = "";
-	bool colon = false;
-	for (int i = 0;i < time.length();i++) {
-		if (time.at(i) != ':' && colon == false) shr += time.at(i);
-		else if (time.at(i) == ':') colon = true;
-		else smin += time.at(i);
-	}
-	hr = stoi(shr);
-	min = stoi(smin);
 
+{
+	while (!(time.length() == 4 && time.at(1)==':') && time.length() != 5) 	// to make sure string entered is in h:mm or hh:mm format
+	{
+		cout << "\nInvalid time format. Please re-enter: "; cin >> time;
+	}
+		string shr = "", smin = "";
+		bool colon = false;
+		for (int i = 0;i < time.length();i++) {
+			if (time.at(i) != ':' && colon == false) shr += time.at(i);
+			else if (time.at(i) == ':') colon = true;
+			else smin += time.at(i);
+		}
+		hr = stoi(shr);
+		min = stoi(smin);	
+}
+
+void settime(string& time, int hr, int min)
+{
+	time = "" + to_string(hr)+':';
+	if (min < 10) time = time + '0';
+	time += to_string(min);
 }
 
 int readMechData(Mechanic arr[], int size) {
@@ -117,7 +123,7 @@ int readMechData(Mechanic arr[], int size) {
 					readM >> starttime >> endtime;
 					readtime(starttime, starthours, startmins);
 					readtime(endtime, endhours, endmins);
-					validatetime(starthours, startmins, endhours, endmins, i, arr[Mcount].getName());
+					validatetime(starthours, startmins, endhours, endmins,starttime,endtime, i, arr[Mcount].getName());
 					available = arr[Mcount].setAppt(starthours, startmins, endhours, endmins, i);
 					if (available == false) cout << "\n\n\nSlot not available for " << arr[Mcount].getName() << " from " << starttime << " to " << endtime;
 				}
@@ -131,9 +137,9 @@ int readMechData(Mechanic arr[], int size) {
 	else { cout << "\n\nfailed to open Mech.txt\n\n"; return -1; }
 }
 
-int readCustData(Customer*& Cptr, Mechanic arr[], int Msize) //I do not think there is need to get age and id for customer
+int readCustData(Customer*& Cptr, Mechanic arr[], int Msize) //I do not think there is need to set age and id for customer
 {
-	ifstream readC("Cust.txt"); string temp;int num, shr, smin, ehr, emin,i=0;
+	ifstream readC("Cust.txt"); string temp,starttime,endtime;int num, shr, smin, ehr, emin,i=0;
 
 	if (!readC.fail())
 	{
@@ -144,11 +150,11 @@ int readCustData(Customer*& Cptr, Mechanic arr[], int Msize) //I do not think th
 		{
 			readC >> temp;
 			(Cptr + i)->setName(temp);
-			readC >> temp;
-			readtime(temp, shr, smin);
-			readC >> temp;
-			readtime(temp, ehr, emin);
-			validatetime(shr, smin, ehr, emin, i + 1, (Cptr + i)->getName());
+			readC >> starttime;
+			readtime(starttime, shr, smin);
+			readC >> endtime;
+			readtime(endtime, ehr, emin);
+			validatetime(shr, smin, ehr, emin, starttime, endtime, 0, (Cptr + i)->getName());
 			(Cptr + i)->setAppt(shr, smin, ehr, emin);
 			i++;
 		}
@@ -180,15 +186,12 @@ int AssignAppt(Customer* Cptr, int cCount, Mechanic arr[], int mCount, Customer*
 		emin = temp.endmins;
 
 		j = i % mCount;
-		if (reserved == false) --j; //in order not to skip a mechanic if an appoinment is cancelled
 		reserved = false;
 		for (int z = 0;z < mCount && reserved == false;z++)
 		{
 			reserved = arr[j].setAppt(shr, smin, ehr, emin, arr[j].getCount());
 			j = ++j % mCount;
 		}
-
-		//current issue: if a mechanic is skipped and the following mechanic is assigned, the new mechanic will still be the first to be assigned to the next customer
 
 		if (reserved == true)
 		{
@@ -200,7 +203,7 @@ int AssignAppt(Customer* Cptr, int cCount, Mechanic arr[], int mCount, Customer*
 		}
 		else
 		{
-			cout << "\nCould Not Reserve Spot for "<< (Cptr + i)->getName() <<": No Mechanics Available.Cancelling Appointment...";
+			cout << "\n\nCould Not Reserve Spot for "<< (Cptr + i)->getName() <<": No Mechanics Available.Cancelling Appointment...\n";
 			(Cptr + i)->setName("");
 			temp.starthours = NULL;
 			temp.startmins = NULL;
@@ -240,7 +243,7 @@ void sortArray(Customer* Cptr, int apptCount) {
 	{
 		for (int j = i+1; j < apptCount;j++)
 		{
-			if (*(Cptr + i) > *(Cptr + j)) swap(Cptr, i, j); //operator mt4a2leb
+			if (*(Cptr + i) > *(Cptr + j)) swap(Cptr, i, j); 
 		}
 	}
 }

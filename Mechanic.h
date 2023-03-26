@@ -18,6 +18,6 @@ public:
 };
 
 
-//notes to self: additions to make later
+//notes to self: additions to make later:
 //add mechanic in breaktime
-//Wanted to use this to give the mechanic time off by setting break time to false but question specified to make them available all 24 hours
+
